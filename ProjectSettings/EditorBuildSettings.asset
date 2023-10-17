@@ -6,6 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  m_configObjects: {}
+    path: Assets/Scenes/TestScene/MoveTest.unity
+    guid: 9a2d19acb14b6d54fbea13fbce3295eb
+  m_configObjects:
+    UnityEngine.Switch.VRKitSettings: {fileID: 11400000, guid: 030e1a0a3872e9541a21094b67585cb9,
+      type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: e619c8d02f835c04a846e3e2fa5277d7,
+      type: 2}

@@ -12,8 +12,19 @@ public class TargetTest : MonoBehaviour
     float height;
     // カメラの高さ
 
+    public void JoinPlayer(GameObject player)
+    {
+        players.Add(player.transform);
+    }
+
+    public void LeftPlayer(GameObject player)
+    {
+        players.Remove(player.transform);
+    }
     private void Update()
     {
+        if(players.Count == 0) return;
+
         Vector3 pos = Vector3.zero;
         // 計算用のローカルVector3を設定
 
