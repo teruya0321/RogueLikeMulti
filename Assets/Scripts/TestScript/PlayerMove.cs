@@ -8,12 +8,15 @@ public class PlayerMove : MonoBehaviour
     // プレイヤーの移動用のスクリプト
     public float speed = 1;
 
-    Vector3 latestPos = Vector3.zero;
-
     PlayerInput playerInput;
 
     float x;
     float z;
+
+    public Animator animator;
+
+    public bool loading;
+    float loadingTimer;
 
     // 最大の回転角速度[deg/s]
     [SerializeField] private float _maxAngularSpeed = Mathf.Infinity;
@@ -36,6 +39,7 @@ public class PlayerMove : MonoBehaviour
     private Vector3 _prevPosition;
 
     private float _currentAngularVelocity;
+
     private void Start()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -47,6 +51,18 @@ public class PlayerMove : MonoBehaviour
     
     void Update()
     {
+        if (loading)
+        {
+            loadingTimer += Time.deltaTime;
+            if(loadingTimer >= 3)
+            {
+                loadingTimer = 0;
+                loading = false;
+            }
+
+            return;
+        }
+
 #if UNITY_EDITOR
         x = Input.GetAxis("Horizontal");
         z = Input.GetAxis("Vertical");
@@ -54,9 +70,16 @@ public class PlayerMove : MonoBehaviour
         x = playerInput.currentActionMap.FindAction("Move").ReadValue<Vector2>().x;
         z = playerInput.currentActionMap.FindAction("Move").ReadValue<Vector2>().y;
 #endif
-        Vector3 movement = new Vector3(x * speed, -2, z * speed);
+        Vector3 movement = new Vector3(x * speed, 0, z * speed);
 
         gameObject.GetComponent<Rigidbody>().velocity = movement;
+
+        if (movement != Vector3.zero) animator.SetBool("Walk", true);
+        else animator.SetBool("Walk", false);
+
+        
+        // キャラの回転方法はコピペです
+
 
         // 現在フレームのワールド位置
         var position = _transform.position;
