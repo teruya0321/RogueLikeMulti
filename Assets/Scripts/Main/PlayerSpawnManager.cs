@@ -10,9 +10,16 @@ public class PlayerSpawnManager : MonoBehaviour
 
     List<Transform> playerSpawnPos = new List<Transform>();
 
+    public Transform bossPlayerSpawn;
+
     public LoadingImage loadingImageScript;
 
     public EnemyManager enemyManager;
+
+    private void Awake()
+    {
+        gameManager = GameManager.MainGameManager;
+    }
     void Start()
     {
         playerList = GameManager.MainGameManager.players;
@@ -25,21 +32,49 @@ public class PlayerSpawnManager : MonoBehaviour
     }
     public void MovePlayers()
     {
+        Debug.Log("移動しているんだが?");
         gameManager.situation = GameManager.Situation.Loading;
 
-        int i = Random.Range(0, playerSpawnPos.Count);
-        PlayerPrefs.SetInt("SpawnPointInt", i);
+        string getStageNumber = GameManager.MainGameManager.ReturnRoundCount().ReturnCount().ToString("00000");
 
-        loadingImageScript.gameObject.SetActive(true);
-        loadingImageScript.StartCoroutine("SettingImage");
-
-        foreach (Transform t in playerList)
+        //Debug.Log("ステージ" +  getStageNumber);
+        if (getStageNumber[getStageNumber.Length - 1] == '0' || getStageNumber[getStageNumber.Length - 1] == '5')
         {
-            t.transform.position = playerSpawnPos[i].position + new Vector3(Random.Range(0,6),0,Random.Range(0,6));
+            //Debug.Log("ボス戦なんだが？");
 
-            t.GetComponent<PlayerMove>().loading = true;
+            PlayerPrefs.SetInt("SpawnInt", -1);
 
-            //enemyManager.SummonEnemy(i);
+            loadingImageScript.gameObject.SetActive(true);
+
+            foreach(Transform t in playerList)
+            {
+                t.transform.position = bossPlayerSpawn.position + new Vector3(Random.Range(0, 6), 0, Random.Range(0, 6));
+
+                t.GetComponent<PlayerMove>().loading = true;
+            }
+
+            gameManager.audioSource.clip = gameManager.clips[1];
+            gameManager.audioSource.Play();
+        }
+
+        else
+        {
+            int i = Random.Range(0, playerSpawnPos.Count);
+            PlayerPrefs.SetInt("SpawnInt", i);
+
+            loadingImageScript.gameObject.SetActive(true);
+
+            foreach (Transform t in playerList)
+            {
+                t.transform.position = playerSpawnPos[i].position + new Vector3(Random.Range(0, 6), 0, Random.Range(0, 6));
+
+                t.GetComponent<PlayerMove>().loading = true;
+
+                //enemyManager.SummonEnemy(i);
+            }
+
+            gameManager.audioSource.clip = gameManager.clips[0];
+            gameManager.audioSource.Play();
         }
     }
 }

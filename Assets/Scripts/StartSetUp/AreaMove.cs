@@ -9,7 +9,7 @@ public class AreaMove : MonoBehaviour
 
     bool countdown;
 
-    float timer = 10f;
+    public float timer = 10f;
 
     public Text countText;
 
@@ -23,7 +23,11 @@ public class AreaMove : MonoBehaviour
 
         countText.text = "‚Ü‚à‚È‚­ƒQ[ƒ€‚ªn‚Ü‚è‚Ü‚·I\n"+ timer.ToString("N2");
 
-        if(timer <= 0) AreaMoving();
+        if (timer <= 0)
+        {
+            AreaMoving();
+            timer = 0;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -6,11 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Title.unity
+    guid: d3037a60d1bd8d746a8848417e403e24
+  - enabled: 1
     path: Assets/Scenes/StartSetUp.unity
     guid: 1565f97cde37ce54b8003cb6db9f825e
   - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: 58f60c15eb0d1e54e96fa6b31fd607a2
+  - enabled: 1
+    path: Assets/Scenes/End.unity
+    guid: 89161e97fe71107498540b88c35a11b0
   m_configObjects:
     UnityEngine.Switch.VRKitSettings: {fileID: 11400000, guid: 030e1a0a3872e9541a21094b67585cb9,
       type: 2}

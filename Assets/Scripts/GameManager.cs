@@ -23,11 +23,22 @@ public class GameManager : MonoBehaviour
 
     public EnemyManager enemyManager;
 
+    RoundCount roundcounter;
+
+    public SettingStatusManager settingStatusManager;
+
+    public BasicStatusManager basicStatusManager;
+
+    public AudioSource audioSource;
+    public AudioClip[] clips;
+
     public enum Situation
     {
         Loading,
         SettingStatus,
-        Battle
+        SpawnTime,
+        Battle,
+        Other
     }
     private void Awake()
     {
@@ -43,6 +54,14 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 30;
+
+        situation = Situation.Other;
+
+        roundcounter = GetComponent<RoundCount>();
+
+        basicStatusManager = GetComponent<BasicStatusManager>();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -58,17 +77,33 @@ public class GameManager : MonoBehaviour
         switch (situation)
         {
             case Situation.Loading:
+                //Debug.Log(situation);
+                /*mainCamera.transform.localEulerAngles = new Vector3
+                    (mainCamera.transform.localEulerAngles.x,
+                    players[0].transform.localEulerAngles.y,
+                    mainCamera.transform.localEulerAngles.z);*/
                 break;
 
             case Situation.SettingStatus:
+                //Debug.Log(situation);
+                break;
+
+            case Situation.SpawnTime:
+                enemyManager.SummonEnemy();
+                situation = Situation.Battle;
                 break;
 
             case Situation.Battle:
-                enemyManager.SummonEnemy();
+                //Debug.Log(situation);
+                break;
+
+            case Situation.Other:
+                //Debug.Log(situation);
                 break;
 
             default:
-                break;  
+                //Debug.Log(situation);
+                break;
         }
     }
 
@@ -94,6 +129,8 @@ public class GameManager : MonoBehaviour
 
     public void CheckPlayer()
     {
+        DontDestroyOnLoad(gameObject);
+
         foreach (Transform t in players)
         {
             DontDestroyOnLoad(t.gameObject);
@@ -104,5 +141,10 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(centerObj);
 
         SceneManager.LoadScene("Main");
+    }
+
+    public RoundCount ReturnRoundCount()
+    {
+        return roundcounter;
     }
 }

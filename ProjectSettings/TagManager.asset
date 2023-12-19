@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
+  - Ground
+  - NotPlayer
   layers:
   - Default
   - TransparentFX
@@ -12,12 +15,12 @@ TagManager:
   - Water
   - UI
   - Ignore Navmesh
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - PlayerCollider
+  - PlayerCollider(NoWall)
+  - Enemy
+  - Ground
+  - Dummbell
   - 
   - 
   - 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,13 +16,7 @@ public class EnemyAI : MonoBehaviour
     EnemyManager manager;
 
     float targetSetTimer;
-
-    int HP;
-    int ATK;
-    int SPEED;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
 
@@ -29,20 +24,22 @@ public class EnemyAI : MonoBehaviour
 
         TargetSet();
     }
+    public NavMeshAgent RequestAgent()
+    {
+        return agent;
+    }
 
     private void OnEnable()
     {
-        manager = GameObject.Find("EnemySpawn").GetComponent<EnemyManager>();
-
-        manager.AddEnemy(gameObject);
+        manager = GameManager.MainGameManager.enemyManager;
     }
 
     // Update is called once per frame
     void Update()
     {
-        agent.SetDestination(target.position);
-
         targetSetTimer += Time.deltaTime;
+        if (target == null) TargetSet();
+        agent.SetDestination(target.position);
     }
 
     private void LateUpdate()
@@ -55,8 +52,20 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    public void EnemyTargetSet(Transform t)
+    {
+        target = t;
+    }
+
     void TargetSet()
     {
+        //Debug.Log(GetComponent<Healing>());
+        if (GetComponent<Healing>() != null)
+        {
+            GetComponent<Healing>().EnemyHealing();
+            return;
+        }
+        Debug.Log("âÒïúÇµÇ»Ç¢Ç∫ÅI");
         targetDistance = 500;
 
         foreach (Transform t in targets)
@@ -71,12 +80,6 @@ public class EnemyAI : MonoBehaviour
             }
         }
     }
-
-    public void GetDamage(int damage)
-    {
-        HP -= damage;
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.tag == "Player")

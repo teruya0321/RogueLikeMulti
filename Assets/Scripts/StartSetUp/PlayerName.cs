@@ -12,9 +12,4 @@ public class PlayerName : MonoBehaviour
 
         GetComponent<TextMesh>().text = transform.parent.name;
     }
-
-    private void LateUpdate()
-    {
-        
-    }
 }

@@ -8,17 +8,24 @@ public class LoadingImage : MonoBehaviour
     public Image image;
 
     public Sprite[] loadingImages;
-    // Start is called before the first frame update
-    void Start()
+
+    public SettingStatusManager settingStatusManager;
+    private void OnEnable()
     {
         StartCoroutine("SettingImage");
     }
-    
+
     public IEnumerator SettingImage()
     {
         image.sprite = loadingImages[Random.Range(0, loadingImages.Length)];
 
         yield return new WaitForSeconds(3);
+
+        if(settingStatusManager.havingPoint) GameManager.MainGameManager.situation = GameManager.Situation.SettingStatus;
+        else GameManager.MainGameManager.situation = GameManager.Situation.SpawnTime;
+
+
+        GameManager.MainGameManager.ReturnRoundCount().RoundProgress();
 
         gameObject.SetActive(false);
     }

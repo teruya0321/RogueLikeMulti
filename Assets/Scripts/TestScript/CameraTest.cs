@@ -17,7 +17,7 @@ public class CameraTest : MonoBehaviour
         Vector3 pos = Vector3.Lerp(transform.position,target.position, Time.deltaTime * 2);
         // カメラをなめらかに移動させるために変数に目的の座標と現在の座標を代入する
 
-        pos.y = targetF.Height() + 10 + target.position.y - (targetF.PlayerCount() * 2);
+        pos.y = targetF.Height() + 10 + target.position.y/* - (targetF.PlayerCount() * 2)*/;
         // 高さを決める。プレイヤーの数によって高さの下限を減らす
 
         transform.position = pos;

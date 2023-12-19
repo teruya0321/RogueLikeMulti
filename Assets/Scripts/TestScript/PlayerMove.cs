@@ -8,7 +8,8 @@ public class PlayerMove : MonoBehaviour
     // プレイヤーの移動用のスクリプト
     public float speed = 1;
 
-    PlayerInput playerInput;
+    public PlayerInput playerInput;
+    PlayerStatus status;
 
     float x;
     float z;
@@ -16,114 +17,49 @@ public class PlayerMove : MonoBehaviour
     public Animator animator;
 
     public bool loading;
-    float loadingTimer;
 
-    // 最大の回転角速度[deg/s]
-    [SerializeField] private float _maxAngularSpeed = Mathf.Infinity;
+    public bool moving = false;
 
-    // 進行方向に向くのにかかるおおよその時間[s]
-    [SerializeField] private float _smoothTime = 0.1f;
-
-    // オブジェクトの正面
-    [SerializeField] private Vector3 _forward = Vector3.forward;
-
-    // オブジェクトの上向き
-    [SerializeField] private Vector3 _up = Vector3.up;
-
-    // 回転軸
-    [SerializeField] private Vector3 _axis = Vector3.up;
-
-    private Transform _transform;
-
-    // 前フレームのワールド位置
-    private Vector3 _prevPosition;
-
-    private float _currentAngularVelocity;
+    public GameObject effects;
 
     private void Start()
     {
         playerInput = GetComponent<PlayerInput>();
 
-        _transform = transform;
-
-        _prevPosition = _transform.position;
+        status = GetComponent<PlayerStatus>();
     }
-    
+
+    public void SettingSpeed(int speedStatus)
+    {
+        speed = speedStatus;
+    }
+
     void Update()
     {
-        if (loading)
-        {
-            loadingTimer += Time.deltaTime;
-            if(loadingTimer >= 3)
-            {
-                loadingTimer = 0;
-                loading = false;
-            }
+        if (GameManager.MainGameManager.situation == GameManager.Situation.SettingStatus || GameManager.MainGameManager.situation == GameManager.Situation.Loading) return;
+        if (status.HP <= 0) return;
+        if (moving) return;
 
-            return;
-        }
+        //Debug.Log("俺は動くぞ！");
 
-#if UNITY_EDITOR
-        x = Input.GetAxis("Horizontal");
-        z = Input.GetAxis("Vertical");
-#else
         x = playerInput.currentActionMap.FindAction("Move").ReadValue<Vector2>().x;
         z = playerInput.currentActionMap.FindAction("Move").ReadValue<Vector2>().y;
-#endif
-        Vector3 movement = new Vector3(x * speed, 0, z * speed);
 
-        gameObject.GetComponent<Rigidbody>().velocity = movement;
-
-        if (movement != Vector3.zero) animator.SetBool("Walk", true);
-        else animator.SetBool("Walk", false);
-
+        var moveVec3 = new Vector3(x, 0, z);
         
-        // キャラの回転方法はコピペです
+        if(moveVec3 != Vector3.zero)
+        {
+            GetComponent<Rigidbody>().AddForce(moveVec3 * speed, ForceMode.Force);
+            var look = Quaternion.LookRotation(moveVec3);
+            transform.rotation = Quaternion.Slerp(transform.rotation, look, 45f);
+            Vector3 movement = new Vector3(x * status.SPEED, 0, z * status.SPEED);
+        }
+        
 
+        gameObject.GetComponent<Rigidbody>().velocity = moveVec3 * speed * 1.5f;
 
-        // 現在フレームのワールド位置
-        var position = _transform.position;
+        animator.SetBool("Walk", moveVec3 != Vector3.zero);
 
-        // 移動量を計算
-        var delta = position - _prevPosition;
-
-        // 次のUpdateで使うための前フレーム位置更新
-        _prevPosition = position;
-
-        // 静止している状態だと、進行方向を特定できないため回転しない
-        if (delta == Vector3.zero)
-            return;
-
-        // 回転補正計算
-        var offsetRot = Quaternion.Inverse(Quaternion.LookRotation(_forward, _up));
-
-        // ワールド空間の前方ベクトル取得
-        var forward = _transform.TransformDirection(_forward);
-
-        // 回転軸と垂直な平面に投影したベクトル計算
-        var projectFrom = Vector3.ProjectOnPlane(forward, _axis);
-        var projectTo = Vector3.ProjectOnPlane(delta, _axis);
-
-        // 軸周りの角度差を求める
-        var diffAngle = Vector3.Angle(projectFrom, projectTo);
-
-        // 現在フレームで回転する角度の計算
-        var rotAngle = Mathf.SmoothDampAngle(
-            0,
-            diffAngle,
-            ref _currentAngularVelocity,
-            _smoothTime,
-            _maxAngularSpeed
-        );
-
-        // 軸周りでの回転の開始と終了を計算
-        var lookFrom = Quaternion.LookRotation(projectFrom);
-        var lookTo = Quaternion.LookRotation(projectTo);
-
-        // 現在フレームにおける回転を計算
-        var nextRot = Quaternion.RotateTowards(lookFrom, lookTo, rotAngle) * offsetRot;
-
-        // オブジェクトの回転に反映
-        _transform.rotation = nextRot;
+        effects.SetActive(animator.GetBool("Walk"));
     }
 }
